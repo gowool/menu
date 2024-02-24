@@ -1,0 +1,4 @@
+{{- $data := . | merge dict -}}
+{{- $data = set $data "listAttributes" (.Item.ChildrenAttributes | merge dict) -}}
+
+{{- template "@menu/list.html" $data -}}

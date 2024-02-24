@@ -1,0 +1,46 @@
+{{if .Item.Display -}}
+    {{- $classes := list (.Item.Attribute "class" "") -}}
+
+    {{- if .Matcher.IsCurrent .Ctx .Item -}}
+        {{- $classes = append $classes .Options.CurrentClass -}}
+    {{- else if .Matcher.IsAncestor .Ctx .Item .Options.MatchingDepth -}}
+        {{- $classes = append $classes .Options.AncestorClass -}}
+    {{- end -}}
+
+    {{- if .Item.ActsLikeFirst -}}
+        {{- $classes = append $classes .Options.FirstClass -}}
+    {{- end -}}
+
+    {{- if .Item.ActsLikeLast -}}
+        {{- $classes = append $classes .Options.LastClass -}}
+    {{- end -}}
+
+    {{- if and .Item.HasChildren (not .Options.IsStop) -}}
+        {{- if .Item.DisplayChildren -}}
+            {{- $classes = append $classes .Options.BranchClass -}}
+        {{- end -}}
+    {{- else -}}
+        {{- $classes = append $classes .Options.LeafClass -}}
+    {{- end -}}
+
+    {{- $attributes := .Item.Attributes | merge dict -}}
+    {{- $attributes = set $attributes "class" (call .Classes $classes) -}}
+
+    <li{{call .Attributes $attributes}}>
+        {{- if and .Item.URI (or (not (.Matcher.IsCurrent .Ctx .Item)) .Options.CurrentAsLink) -}}
+            {{- template "@menu/link.html" . -}}
+        {{- else -}}
+            {{- $tpl := .Options.Extra "span_template" -}}
+            {{- template "@menu/span.html" . -}}
+        {{- end -}}
+
+        {{- $classes = list (.Item.ChildrenAttribute "class" "") (.Item.Level | printf "menu-level-%d") -}}
+        {{- $listAttributes := .Item.ChildrenAttributes | merge dict -}}
+        {{- $listAttributes = set $listAttributes "class" (call .Classes $classes) -}}
+
+        {{- $data := . | merge dict}}
+        {{- $data = set $data "listAttributes" $listAttributes -}}
+
+        {{- template "@menu/list.html" $data -}}
+    </li>
+{{- end -}}

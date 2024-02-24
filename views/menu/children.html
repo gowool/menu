@@ -1,0 +1,10 @@
+{{- $options := .Options.SubDepth -}}
+{{- $options = .Options.SubMatchingDepth -}}
+{{- range $item := .Item.Children -}}
+    {{- $data := dict -}}
+    {{- $data = merge $data $ -}}
+    {{- $data = set $data "Item" $item -}}
+    {{- $data = set $data "Options" $options.Copy -}}
+
+    {{- template "@menu/item.html" $data -}}
+{{- end -}}
